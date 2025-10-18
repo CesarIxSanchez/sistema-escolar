@@ -3,14 +3,14 @@ package mx.uacam.fi.its;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.ResultSet;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.sql.*;
 
 import javax.swing.*;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class MainSSH {
     private static final String hostname = "fi.jcaguilar.dev";
@@ -22,7 +22,6 @@ public class MainSSH {
     private static int port;
     public static String sql;
     public static String texto;
-    public static StringBuilder textoBuilder = new StringBuilder();
 
     public static void ejecutarConexion() throws JSchException, SQLException{
         JSch jsch = new JSch();
@@ -62,26 +61,28 @@ public class MainSSH {
         }
     }
 
-    public static void ejecutarComandoSelect() throws JSchException, SQLException {
-        textoBuilder.setLength(0); // Se limpia el textBuilder
+    public static ObservableList<Asistencia> ejecutarComandoSelect() throws JSchException, SQLException {
+        ObservableList<Asistencia> list = FXCollections.observableArrayList();
+
         try (Connection con = obtenerConexion()) {
             Statement sentencia = con.createStatement();
             ResultSet resultado = sentencia.executeQuery(sql);
 
             while(resultado.next()) {
-                String id_asistencia = resultado.getString(1);
-                String id_inscripcion = resultado.getString(2);
+                int id_asistencia = resultado.getInt(1);
+                int id_inscripcion = resultado.getInt(2);
                 String fecha = resultado.getString(3);
-                String created_at = resultado.getString(4);
-                String updated_at = resultado.getString(5);
-                // Usando StringBuilder
-                textoBuilder.append("ID Asistencia: ").append(id_asistencia).append(", ID Inscripcion: ").append(id_inscripcion).append(", Fecha: ")
-                        .append(fecha).append(", Creado: ").append(created_at).append(", Actualizado: ").append(updated_at).append("\n");
 
+                Timestamp created_at = resultado.getTimestamp(4);
+                Timestamp updated_at = resultado.getTimestamp(5);
+                LocalDateTime created_at_time = created_at != null ? created_at.toLocalDateTime() : null;
+                LocalDateTime updated_at_time = updated_at != null ? updated_at.toLocalDateTime() : null;
+
+                list.add(new Asistencia(id_asistencia, id_inscripcion, fecha, created_at_time, updated_at_time));
             }
-            texto = textoBuilder.toString();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return list;
     }
 }

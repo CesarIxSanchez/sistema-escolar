@@ -9,10 +9,11 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Main extends Application{
+    @Override
     public void start(Stage escenario){
         try{
-            System.out.println(getClass().getResource("/Asistencias.fxml"));
-            Parent raiz = FXMLLoader.load(getClass().getResource("/Asistencias.fxml"));
+            System.out.println(getClass().getResource("/Menu.fxml"));
+            Parent raiz = FXMLLoader.load(getClass().getResource("/Menu.fxml"));
             Scene escena = new Scene(raiz);
             escenario.setScene(escena);
             escenario.show();
