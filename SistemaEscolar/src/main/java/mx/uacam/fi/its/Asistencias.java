@@ -1,20 +1,17 @@
 package mx.uacam.fi.its;
 
+import javafx.application.Platform;
+import javafx.scene.control.*;
 import mx.uacam.fi.its.Asistencia;
 import com.jcraft.jsch.JSchException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TableColumn;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import javax.swing.*;
@@ -25,6 +22,9 @@ import java.time.format.DateTimeFormatter;
 
 
 public class Asistencias {
+
+    public static String id_inscripcion;
+    public static String fecha;
 
     @FXML
     private TableView<Asistencia> tabla;
@@ -84,6 +84,7 @@ public class Asistencias {
             date = fechaSeleccionada.format(formatter);
             System.out.println("Fecha seleccionada (formato YYYY/MM/DD): " + date);
         } else{
+            date = null;
             System.out.println("No se ha seleccionado una fecha.");
         }
     }
@@ -117,8 +118,7 @@ public class Asistencias {
 
     private void refrescarTabla() throws Exception {
         MainSSH.ejecutarConexion();
-        // comando sql
-        MainSSH.sql = "SELECT id_asistencia, id_inscripcion, fecha, created_at, updated_at FROM asistencias ORDER BY id_asistencia ASC;";
+
         // se ejecuta el comando select
         ObservableList<Asistencia> nuevas = MainSSH.ejecutarComandoSelect();
 
@@ -127,13 +127,21 @@ public class Asistencias {
 
         // Reaplica orden
         tabla.sort();
+
         MainSSH.desconectar();
     }
 
     private void logicAsistencias(){
         obtenerFecha();
-        if (idInscripcionTextField.getText().isEmpty() || date.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Por favor, ingrese todos los datos.");
+        if (idInscripcionTextField.getText().isEmpty() || date == null) {
+            // alert porque JOptionPane peta la GUI
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Advertencia");
+                alert.setHeaderText(null);
+                alert.setContentText("Por favor, ingrese todos los datos.");
+                alert.showAndWait();
+            });
             idInscripcionTextField.setText("");
             datePicker.setValue(null);
             return;
@@ -142,11 +150,8 @@ public class Asistencias {
         try {
             MainSSH.ejecutarConexion();
 
-            int id_inscripcion = Integer.parseInt(idInscripcionTextField.getText());
-            String fecha = date;
-
-            MainSSH.sql = String.format("INSERT INTO asistencias(id_inscripcion, fecha) VALUES (%d, '%s');", id_inscripcion, fecha);
-            System.out.println(MainSSH.sql);
+            id_inscripcion = idInscripcionTextField.getText();
+            fecha = date;
 
             MainSSH.ejecutarComandoUpdate();
 
@@ -158,7 +163,14 @@ public class Asistencias {
             MainSSH.desconectar();
         } catch (Exception e){
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Hubo un error al realizar la operación.");
+            // alert porque JOptionPane peta la GUI
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("ERROR");
+                alert.setHeaderText(null);
+                alert.setContentText("Hubo un error al realizar la operación.");
+                alert.showAndWait();
+            });
         }
     }
 

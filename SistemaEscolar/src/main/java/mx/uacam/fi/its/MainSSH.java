@@ -3,8 +3,10 @@ package mx.uacam.fi.its;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 
 import java.sql.*;
 
@@ -20,8 +22,6 @@ public class MainSSH {
     private static final String dbPass = "FdI-its-5a";
     private static Session sesion;
     private static int port;
-    public static String sql;
-    public static String texto;
 
     public static void ejecutarConexion() throws JSchException, SQLException{
         JSch jsch = new JSch();
@@ -49,15 +49,48 @@ public class MainSSH {
     public static Connection obtenerConexion() throws SQLException{
         String conString = "jdbc:mariadb://localhost:" + port + "/its5a";
         System.out.println(conString);
-        return (Connection) DriverManager.getConnection(conString, dbUser, dbPass);
+        return DriverManager.getConnection(conString, dbUser, dbPass);
     }
 
     public static void ejecutarComandoUpdate() throws JSchException, SQLException {
         try (Connection con = obtenerConexion()) {
-            Statement sentencia = con.createStatement();
-            sentencia.executeUpdate(sql);
-        } catch (Exception e) {
+            PreparedStatement sentencia = con.prepareStatement("INSERT INTO asistencias(id_inscripcion, fecha) VALUES (?, ?);");
+            sentencia.setString(1, Asistencias.id_inscripcion);
+            sentencia.setString(2, Asistencias.fecha);
+            int resultado = sentencia.executeUpdate();
+
+            // alert porque JOptionPane peta la GUI
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                if (resultado > 0){
+                    alert.setTitle("Éxito");
+                    alert.setHeaderText(null);
+                    alert.setContentText(String.format("Se ha(n) insertado %d fila(s).", resultado));
+                } else {
+                    alert.setTitle("Error");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Error al insertar datos");
+                }
+                alert.showAndWait();
+            });
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error de duplicado");
+                alert.setHeaderText("Registro duplicado");
+                alert.setContentText("Ya existe un registro con la misma combinación de ID de inscripción y fecha.");
+                alert.showAndWait();
+            });
+        } catch (SQLException e){
+            e.printStackTrace();
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Problema con la base de datos");
+                alert.setContentText("Hubo un error al intentar realizar la operación.");
+                alert.showAndWait();
+            });
         }
     }
 
@@ -65,8 +98,8 @@ public class MainSSH {
         ObservableList<Asistencia> list = FXCollections.observableArrayList();
 
         try (Connection con = obtenerConexion()) {
-            Statement sentencia = con.createStatement();
-            ResultSet resultado = sentencia.executeQuery(sql);
+            PreparedStatement sentencia = con.prepareStatement("SELECT id_asistencia, id_inscripcion, fecha, created_at, updated_at FROM asistencias ORDER BY id_asistencia ASC;");
+            ResultSet resultado = sentencia.executeQuery();
 
             while(resultado.next()) {
                 int id_asistencia = resultado.getInt(1);
