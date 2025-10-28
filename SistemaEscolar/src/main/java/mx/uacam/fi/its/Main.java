@@ -15,6 +15,7 @@ public class Main extends Application{
             System.out.println(getClass().getResource("/Menu.fxml"));
             Parent raiz = FXMLLoader.load(getClass().getResource("/Menu.fxml"));
             Scene escena = new Scene(raiz);
+            escenario.setTitle("Sistema Escolar - Menú Principal");
             escenario.setScene(escena);
             escenario.show();
         } catch (IOException e){

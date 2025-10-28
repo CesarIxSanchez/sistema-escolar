@@ -7,5 +7,8 @@ module SistemaEscolar {
     requires com.jcraft.jsch;
     requires org.mariadb.jdbc;
 
-    opens mx.uacam.fi.its to javafx.fxml, javafx.graphics, javafx.controls;
+    exports mx.uacam.fi.its;
+    opens mx.uacam.fi.its to javafx.fxml, javafx.base, javafx.graphics, javafx.controls;
+    opens controladorP to javafx.fxml;
+    opens modeloP to javafx.fxml;
 }
