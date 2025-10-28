@@ -5,15 +5,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import MainSSH.MainSSHPersonas; // Asegúrate de que este import sea correcto
+import javafx.stage.Stage;
 import modeloP.Persona;  // Asegúrate de que este import sea correcto
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 public class Controladorpersonas {
 
-    // ---- Componentes de la UI (Asegúrate que coincidan con fx:id en FXML) ----
+    // ---- Componentes de la UI
     @FXML private TextField nombre;
     @FXML private TextField apellidoP;
     @FXML private TextField apellidoM;
@@ -92,6 +98,23 @@ public class Controladorpersonas {
                 MainSSHPersonas.desconectar();
             }
         }).start();
+    }
+
+    @FXML
+    void menuButtonPressed(ActionEvent event) {
+        cambiarVentana(event, "/Menu.fxml");
+    }
+
+    private void cambiarVentana(ActionEvent event, String vistaFXML) {
+        try {
+            Parent nuevaVista = FXMLLoader.load(getClass().getResource(vistaFXML));
+            Scene nuevaEscena = new Scene(nuevaVista);
+            Stage ventana = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            ventana.setScene(nuevaEscena);
+            ventana.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
