@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="730.0" prefWidth="830.0" style="-fx-background-color: #144320;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controladorP.Controladorpersonas">
+    <children>
+        <TextField fx:id="nombre" layoutX="31.0" layoutY="182.0" />
+        <TextField fx:id="apellidoP" layoutX="273.0" layoutY="182.0" />
+        <Label layoutX="31.0" layoutY="147.0" text="Nombre" textFill="WHITE">
+            <font>
+                <Font name="Book Antiqua" size="27.0" />
+            </font>
+        </Label>
+        <Label layoutX="268.0" layoutY="148.0" text="Apellido Paterno" textFill="WHITE">
+            <font>
+                <Font name="Book Antiqua" size="26.0" />
+            </font>
+        </Label>
+        <Text fill="WHITE" layoutX="226.0" layoutY="96.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Registro de Personas">
+            <font>
+                <Font name="Book Antiqua" size="41.0" />
+            </font>
+        </Text>
+
+        <ComboBox fx:id="sexo" layoutX="26.0" layoutY="290.0" prefHeight="31.0" prefWidth="162.0" promptText="Sexo" />
+
+        <ComboBox fx:id="rol" layoutX="26.0" layoutY="405.0" prefHeight="31.0" prefWidth="162.0" promptText="Rol" />
+
+        <TextField fx:id="apellidoM" layoutX="489.0" layoutY="182.0" />
+        <Label layoutX="489.0" layoutY="148.0" text="Apellido Materno" textFill="WHITE">
+            <font>
+                <Font name="Book Antiqua" size="26.0" />
+            </font>
+        </Label>
+        <Label layoutX="26.0" layoutY="236.0" text="Escoge tu sexo" textFill="WHITE">
+            <font>
+                <Font name="Book Antiqua" size="27.0" />
+            </font>
+        </Label>
+        <Label layoutX="24.0" layoutY="348.0" text="Escoge tu rol" textFill="WHITE">
+            <font>
+                <Font name="Book Antiqua" size="27.0" />
+            </font>
+        </Label>
+
+        <TextArea fx:id="baseDD" editable="false" layoutX="231.0" layoutY="254.0" prefHeight="209.0" prefWidth="457.0" />
+
+        <Button fx:id="guardar" layoutX="26.0" layoutY="467.0" mnemonicParsing="false" onAction="#onGuardar" prefHeight="42.0" prefWidth="174.0" style="-fx-background-color: black;" text="Guardar" textFill="WHITE">
+            <font>
+                <Font name="Book Antiqua" size="15.0" />
+            </font>
+        </Button>
+
+        <Button fx:id="asistencias" layoutX="548.0" layoutY="571.0" mnemonicParsing="false" prefHeight="92.0" prefWidth="154.0" style="-fx-background-color: #dab51d;" text="Asistencias">
+            <font>
+                <Font name="Book Antiqua" size="15.0" />
+            </font>
+        </Button>
+        <Button fx:id="materias" layoutX="342.0" layoutY="573.0" mnemonicParsing="false" prefHeight="92.0" prefWidth="140.0" style="-fx-background-color: #dab51d;" text="Materias">
+            <font>
+                <Font name="Book Antiqua" size="15.0" />
+            </font>
+        </Button>
+        <Text fill="WHITE" layoutX="301.0" layoutY="524.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Otras Tablas ">
+            <font>
+                <Font name="Book Antiqua" size="41.0" />
+            </font>
+        </Text>
+        <Button fx:id="inscripcion" layoutX="93.0" layoutY="573.0" mnemonicParsing="false" prefHeight="92.0" prefWidth="162.0" style="-fx-background-color: #dab51d;" text="Inscripcion">
+            <font>
+                <Font name="Book Antiqua" size="15.0" />
+            </font>
+        </Button>
+        <DatePicker fx:id="fNacimiento" layoutX="26.0" layoutY="569.0" />
+        <Label layoutX="24.0" layoutY="528.0" text="Fecha de nacimiento" textFill="WHITE">
+            <font>
+                <Font name="Book Antiqua" size="27.0" />
+            </font>
+        </Label>
+    </children>
+</Pane>
