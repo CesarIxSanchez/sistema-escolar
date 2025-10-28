@@ -52,6 +52,7 @@ public class MainSSH {
         return DriverManager.getConnection(conString, dbUser, dbPass);
     }
 
+    // Asistencia
     public static void ejecutarComandoUpdate() throws JSchException, SQLException {
         try (Connection con = obtenerConexion()) {
             PreparedStatement sentencia = con.prepareStatement("INSERT INTO asistencias(id_inscripcion, fecha) VALUES (?, ?);");
@@ -119,10 +120,7 @@ public class MainSSH {
         return list;
     }
 
-
-
-    //Materias
-    // Ejecuta INSERT/UPDATE/DELETE usando PreparedStatement.
+    // Materias
     public static int ejecutarComandoUpdate(Materia materia) {
         int filas = 0;
         try (Connection con = obtenerConexion()) {
@@ -135,7 +133,7 @@ public class MainSSH {
             ps.setInt(3, materia.getCreditos());
 
             filas = ps.executeUpdate();
-            final int filasInsertadas = ps.executeUpdate();
+            final int filasInsertadas = ps.executeUpdate(); // (OJO: esto ejecuta DOS veces el insert)
             filas = filasInsertadas;
 
             // Mostrar alerta al usuario
@@ -174,7 +172,6 @@ public class MainSSH {
         return filas;
     }
 
-
     // Ejecuta un SELECT de materias usando PreparedStatement y mapea a ObservableList<Materia>.
     public static ObservableList<Materia> ejecutarComandoSelectMaterias(String sql) {
         ObservableList<Materia> list = FXCollections.observableArrayList();
@@ -203,4 +200,91 @@ public class MainSSH {
         }
         return null;
     }
+
+    // Inscripcion
+    public static void ejecutarComandoUpdateInscripciones() throws SQLException {
+        try (Connection con = obtenerConexion()) {
+            PreparedStatement ps = con.prepareStatement(
+                    "INSERT INTO inscripciones(id_inscripcion, id_materia, id_estudiante, calificacion) VALUES (?, ?, ?, ?);"
+            );
+            ps.setInt(1, Integer.parseInt(Inscripciones.id_inscripcion_value));
+            ps.setInt(2, Integer.parseInt(Inscripciones.id_materia_value));
+            ps.setInt(3, Integer.parseInt(Inscripciones.id_estudiante_value));
+            if (Inscripciones.calificacion_value == null) {
+                ps.setNull(4, Types.INTEGER);
+            } else {
+                ps.setInt(4, Inscripciones.calificacion_value);
+            }
+
+            int resultado = ps.executeUpdate();
+
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                if (resultado > 0){
+                    alert.setTitle("Éxito");
+                    alert.setHeaderText(null);
+                    alert.setContentText(String.format("Se ha(n) insertado %d fila(s).", resultado));
+                } else {
+                    alert.setTitle("Error");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Error al insertar datos");
+                }
+                alert.showAndWait();
+            });
+        } catch (SQLIntegrityConstraintViolationException e) {
+            e.printStackTrace();
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error de duplicado");
+                alert.setHeaderText("Registro duplicado / FK");
+                alert.setContentText("Ya existe un registro con ese id_inscripcion o hay violación de llave foránea.");
+                alert.showAndWait();
+            });
+            throw e;
+        } catch (SQLException e){
+            e.printStackTrace();
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Problema con la base de datos");
+                alert.setContentText("Hubo un error al intentar realizar la operación.");
+                alert.showAndWait();
+            });
+            throw e;
+        }
+    }
+
+    public static ObservableList<Inscripcion> ejecutarComandoSelectInscripciones() {
+        ObservableList<Inscripcion> list = FXCollections.observableArrayList();
+        try (Connection con = obtenerConexion()) {
+            PreparedStatement ps = con.prepareStatement(
+                    "SELECT id_inscripcion, id_materia, id_estudiante, calificacion, created_at, updated_at " +
+                            "FROM inscripciones ORDER BY id_inscripcion ASC;"
+            );
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int idIns = rs.getInt(1);
+                int idMat = rs.getInt(2);
+                int idEst = rs.getInt(3);
+                Integer cal = rs.getObject(4) == null ? null : rs.getObject(4, Integer.class);
+
+                Timestamp cAt = rs.getTimestamp(5);
+                Timestamp uAt = rs.getTimestamp(6);
+
+                list.add(new Inscripcion(
+                        idIns,
+                        idMat,
+                        idEst,
+                        cal,
+                        cAt != null ? cAt.toLocalDateTime() : null,
+                        uAt != null ? uAt.toLocalDateTime() : null
+                ));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
+

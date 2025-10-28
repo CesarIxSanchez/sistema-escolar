@@ -15,25 +15,12 @@ public class Main extends Application{
             System.out.println(getClass().getResource("/Menu.fxml"));
             Parent raiz = FXMLLoader.load(getClass().getResource("/Menu.fxml"));
             Scene escena = new Scene(raiz);
+            escenario.setTitle("Sistema Escolar - Menú Principal");
             escenario.setScene(escena);
             escenario.show();
         } catch (IOException e){
             System.out.println(e);
-        }/*try {
-    //  Carga el FXML desde la carpeta resources
-                System.out.println(getClass().getResource("/materias.fxml"));
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/materias.fxml"));
-                Parent root = loader.load();
-
-            Scene scene = new Scene(root);
-            escenario.setTitle("Gestión de Materias");
-            escenario.setScene(scene);
-            escenario.setResizable(false);
-            escenario.show();
-
-        }catch (IOException e){
-            System.out.println(e);
-    }*/
+        }
     }
 
     public static void main(String[] args) {

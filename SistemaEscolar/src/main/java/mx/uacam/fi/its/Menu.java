@@ -19,7 +19,7 @@ public class Menu {
 
     @FXML
     void inscripcionesButtonPressed(ActionEvent event) {
-        cambiarVentana(event, "/Inscripción.fxml");
+        cambiarVentana(event, "/inscripcion.fxml");
     }
 
     @FXML
